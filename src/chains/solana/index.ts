@@ -41,8 +41,6 @@ export async function getTokenBalance(params: {address: string, asset: string}):
     }
   })
 
-  for (let item of data.data.items) { console.log(item) }
-
   const contract = data.data.items.find((item: CovalentTokenBalanceResponseItem) => item.contract_address === params.asset)
 
   if (!contract) { return 0 }

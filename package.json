@@ -1,9 +1,12 @@
 {
   "name": "usdc",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "USDC Multi-Chain Payments SDK",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
+    "prepublish": "tsc",
     "test": "NODE_ENV=test nyc --reporter=lcov mocha --require=ts-node/register --timeout=20000 test/*_test.ts --exit",
     "runtest": "NODE_ENV=test mocha --require=ts-node/register --timeout=20000 $1"
   },
