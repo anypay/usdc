@@ -10,7 +10,7 @@
  *
  */
 
-import * as tronWeb from 'tronweb'
+const tronWeb = require('tronweb')
 
 /**
  * Fetches the token balances from a Tron blockchain provider. It is designed to support

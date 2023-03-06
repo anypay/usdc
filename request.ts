@@ -1,5 +1,5 @@
 
-import * as moment from 'moment'
+import moment from 'moment'
 
 interface PaymentRequest {
   time: Date;
@@ -78,6 +78,8 @@ export async function option({
 }): Promise<EthPaymentOption> {
 
   const option = template.find(option => option.chain === chain && option.currency === currency)
+
+  if (!option) { throw new Error('ETHPaymentOption not found') }
 
   return {
     instructions: option.to.map(to => {

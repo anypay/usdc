@@ -20,7 +20,6 @@ import { ethers } from 'ethers'
 
 import BigNumber from 'bignumber.js'
 
-import { getPosClient } from "./pos_client";
 import ERC20_ABI from '../ethereum/erc20_abi';
 
 const usdc_token_address = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'
@@ -54,18 +53,6 @@ export interface CovalentTokenBalanceResponseItem {
  *
  */
 export async function getTokenBalance(params: {address: string, asset: string}): Promise<number> {
-
-  /*
-
-  const posClient = await getPosClient({ address: params.address })
-
-  const erc20ChildToken = posClient.erc20(params.asset);
-
-  const balance = await erc20ChildToken.getBalance(params.address)
-
-  return parseInt(balance);
-
-  */
 
   const covalentChainID = 137
 

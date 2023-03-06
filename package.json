@@ -1,6 +1,6 @@
 {
   "name": "usdc",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "USDC Multi-Chain Payments SDK",
   "main": "dist/index.js",
   "scripts": {

@@ -20,7 +20,7 @@ export async function getPosClient({ mnemonic, address }: {mnemonic?: string, ad
             parent: {
               provider: new HDWalletProvider({
                 mnemonic,
-                providerOrUrl: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'
+                providerOrUrl: String(process.env.infura_polygon_url)
               }),
               defaultConfig: {
                 from : address

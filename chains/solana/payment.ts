@@ -18,7 +18,7 @@ interface Output {
 const TOKEN_PROGRAM = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
 const SYSTEM_PROGRAM = '11111111111111111111111111111111'
 
-const SPL_TOKENS = {
+const SPL_TOKENS: any = {
   'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v': 'USDC',
   'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': 'USDT'
 }
@@ -28,7 +28,7 @@ export class SolanaPayment {
   buffer: Buffer;
   transaction: Transaction;
   record: any;
-  txid: string;
+  txid?: string;
 
   constructor(hex: string) {
 

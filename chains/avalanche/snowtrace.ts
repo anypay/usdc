@@ -89,7 +89,7 @@ export class Snowtrace {
 
 }
 
-const snowtrace_api_key = process.env.snowtrace_api_key
+const snowtrace_api_key = String(process.env.snowtrace_api_key)
 
 const snowtrace = new Snowtrace({ apikey: snowtrace_api_key })
 

@@ -21,6 +21,12 @@ import { mnemonicToSeedSync } from 'bip39'
 
 import { Keypair } from 'stellar-sdk'
 
+interface StellarHorizonResponseAccountBalance {
+  asset_issuer: string;
+  asset_code: string;
+  asset_type: string;
+}
+
 /**
  * Fetches the token balances from a Stellar blockchain provider. It is designed to support
  * native assets on Stellar, specificially USDC.
@@ -30,7 +36,7 @@ export async function getTokenBalance(params: {address: string, asset: string, i
 
   const { data } = await axios.get(`https://horizon.stellar.org/accounts/${params.address}`)
 
-  const balance = data.balances.find(balance => {
+  const balance = data.balances.find((balance: StellarHorizonResponseAccountBalance) => {
 
     return balance.asset_issuer == params.issuer &&
            balance.asset_code == params.asset
@@ -83,7 +89,7 @@ export async function getGasBalance(params: {address: string}): Promise<number> 
 
   const { data } = await axios.get(`https://horizon.stellar.org/accounts/${params.address}`)
 
-  const balance = data.balances.find(balance => balance.asset_type === 'native')
+  const balance = data.balances.find((balance: StellarHorizonResponseAccountBalance) => balance.asset_type === 'native')
 
   if (!balance) {
 
