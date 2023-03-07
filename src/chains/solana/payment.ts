@@ -56,7 +56,7 @@ export class SolanaPayment {
       return output.address === address && output.amount === amount
     })
 
-    return outputs.length === 1
+    return outputs.length >= 1
 
   }
 

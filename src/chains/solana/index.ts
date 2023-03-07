@@ -8,12 +8,13 @@
  * - https://github.com/solana-labs/solana-web3.js/
  * - https://solanacookbook.com/#contributing
  * - https://www.quicknode.com/guides/solana-development/spl-tokens/how-to-transfer-spl-tokens-on-solana/
+ * - https://solanacookbook.com/guides/retrying-transactions.html#how-clients-submit-transactions
  *
  */
 
 import * as bip39 from 'bip39'
 
-import { Keypair, PublicKey } from '@solana/web3.js'
+import { Keypair, PublicKey, Connection, Transaction } from '@solana/web3.js'
 
 import { CovalentTokenBalanceResponseItem } from '../polygon'
 
@@ -22,6 +23,12 @@ import axios from 'axios'
 import BigNumber from 'bignumber.js'
 
 import { SolanaPayment } from './payment'
+
+import * as spl from '@solana/spl-token'
+
+import { establishConnection } from './establishConnection'
+
+import * as nacl from "tweetnacl";
 
 /**
  * Fetches the token balances from a Solana blockchain provider. It is designed to support
@@ -117,6 +124,15 @@ export function getAddressFromMnemonic({ mnemonic }: {mnemonic: string }): strin
   return keypair.publicKey.toString()
 
 }
+
+export function getKeypairFromMnemonic({ mnemonic }: { mnemonic: string }): Keypair {
+  
+  const seed = bip39.mnemonicToSeedSync(mnemonic, ""); // (mnemonic, password)
+  const keypair = Keypair.fromSeed(seed.slice(0, 32));
+
+  return keypair
+}
+
 /**
  * Determines whether a string is or is not a valid Ethereum address 
  */
@@ -141,14 +157,137 @@ export function isAddress({ address }: {address: string }): boolean {
  * Parses a USDC transfer transaction on Solana
  * 
  */
-export async function parseUSDCTransaction({ txhex }: { txhex: string}): Promise<any> {
+export async function parseUSDCTransaction({ txhex }: { txhex: string}): Promise<SolanaPayment> {
+
+  const transaction = Transaction.from(Buffer.from(txhex, 'hex'))
+
+  const outputs = transaction.instructions.map(instruction => {
+    return instruction.data.toString('hex')
+  })
+
+  console.log({ outputs })
+
+  console.log(transaction.serialize().toString('hex'), 'hex')
 
   const payment = new SolanaPayment(txhex)
-
-  console.log(payment.outputs, 'payment.outputs')
-
-  console.log(payment.references, 'payment.references')
 
   return payment
 
 }
+
+export function validatePayment({
+  txhex,
+  outputs
+}: {
+  txhex: string,
+  outputs: {
+    address: string,
+    amount: number
+  }[]
+}): true {
+
+  const payment = new SolanaPayment(txhex)
+
+  for (let output of outputs) {
+
+    if (!payment.includesOutput(output.address, output.amount)) {
+
+      throw new Error(`output of ${output.amount} to ${output.address} not found`)
+
+    }
+
+  }
+
+  return true
+
+}
+
+/**
+ *
+ * Build a signed transaction hex given an array of desired recipients and amounts
+ *
+ */
+export async function buildPayment({
+  mnemonic,
+  to
+}: {
+  mnemonic: string,
+  to: {
+    address: string;
+    amount: number;
+  }[]
+}): Promise<string> {
+
+  const connection: Connection = await establishConnection()
+
+  const tx = new Transaction()
+
+  const from = getKeypairFromMnemonic({ mnemonic })
+
+  const feePayer = from;
+
+  for (let output of to) {
+
+    const recipient = new PublicKey(output.address);
+
+    const mintPubkey = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
+
+    // get recipient token account public key
+
+    tx.add(
+      spl.createTransferCheckedInstruction(
+        from.publicKey, // from (should be a token account)
+        mintPubkey, // mint
+        recipient, // to (should be a token account)
+        from.publicKey, // from's owner
+        1e6, // amount, if your deciamls is 8, send 10^6 for 0.01 token
+        8 // decimals
+      )
+    );
+
+  }
+
+  tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+
+  tx.feePayer = feePayer.publicKey;
+
+  let realDataNeedToSign = tx.serializeMessage();
+
+    // 2. Sign Transaction
+  // use any lib you like, the main idea is to use ed25519 to sign it.
+  // the return signature should be 64 bytes.
+  let feePayerSignature = nacl.sign.detached(
+    realDataNeedToSign,
+    feePayer.secretKey
+  );
+
+  let fromSignature = nacl.sign.detached(realDataNeedToSign, from.secretKey);
+
+  let verifyFeePayerSignatureResult = nacl.sign.detached.verify(
+    realDataNeedToSign,
+    feePayerSignature,
+    feePayer.publicKey.toBytes() // you should use the raw pubkey (32 bytes) to verify
+  );
+
+  console.log(`verify feePayer signature: ${verifyFeePayerSignatureResult}`)
+
+  let verifyFromSignatureResult = nacl.sign.detached.verify(
+    realDataNeedToSign,
+    fromSignature,
+    from.publicKey.toBytes()
+  );
+  console.log(`verify alice signature: ${verifyFromSignatureResult}`);
+
+  tx.addSignature(feePayer.publicKey, Buffer.from(feePayerSignature))
+
+  tx.addSignature(from.publicKey, Buffer.from(fromSignature))
+
+  console.log(tx)
+
+  return tx.serialize().toString('hex')
+
+}
+
+export * as vectors from './vectors'
+
+
