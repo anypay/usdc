@@ -10,6 +10,8 @@ require('dotenv').config()
  * - https://cointelegraph.com/blockchain-for-beginners/polygon-blockchain-explained-a-beginners-guide-to-matic
  * - https://github.com/maticnetwork/matic.js/
  * - https://wiki.polygon.technology/docs/develop/ethereum-polygon/matic-js/get-started/
+ * - https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io/guide/sending-transactions.html#example
+ * - https://medium.com/@kaishinaw/connect-metamask-with-ethers-js-fc9c7163fd4d
  * 
  * 
  */
@@ -28,7 +30,6 @@ const usdc_token_address = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'
 
 const matic_token_address = '0x0000000000000000000000000000000000001010'
 
-const provider = new ethers.providers.JsonRpcProvider(process.env.infura_url_polygon)
 
 export interface CovalentTokenBalanceResponseItem {
   contract_decimals: number;
@@ -153,13 +154,33 @@ export function isAddress({ address }: {address: string }): boolean {
  */
 export async function buildUSDCTransfer({ mnemonic, to, amount, memo }: { mnemonic: string, to: string, amount: number, memo?: string}): Promise<string> {
 
+  console.log('BUILD USDC TRANSFER')
+
+  const {chainId} = ethers.providers.getNetwork('matic')
+
+  console.log("CHAIN ID", chainId)
+
+  const provider = new ethers.providers.JsonRpcProvider(process.env.infura_polygon_url, chainId)
+
+  console.log("PROVIDER", provider)
+
   const senderWallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider)
+
+  console.log("SENDER WALLET", senderWallet)
 
   const value = ethers.utils.parseUnits(amount.toString(), 6)
 
-  const contract = new ethers.Contract('0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e', ERC20_ABI, senderWallet);
+  const signer = provider.getSigner(senderWallet.address)
+
+  console.log("SIGNER", signer)
+
+  const contract = new ethers.Contract('0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e', ERC20_ABI, signer);
+
+  console.log('CONTRACT', contract)
 
   const result = await contract.transfer(to, value)
 
   return result
 }
+
+export { getPosClient } from './pos_client'

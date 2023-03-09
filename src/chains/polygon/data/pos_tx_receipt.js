@@ -1,0 +1,48 @@
+const pos_tx_receipt = {
+    blockHash: '0xb2c79c1a7f0260236609649491e2c97009a0e0b52fdd7eeb84a9647dc4b25293',
+    blockNumber: 40149134,
+    contractAddress: null,
+    cumulativeGasUsed: 9260992,
+    from: '0x40b54e66c2ac5a13a1657adbbbd1c783b21b22ef',
+    gasUsed: 40804,
+    status: true,
+    to: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
+    transactionHash: '0xa9f97d3e0ce7a4a567d081b6c57abe108e486b5f508bf8c123827f44e7e4236b',
+    transactionIndex: 53,
+    events: {
+      '0': {
+        address: '0x0000000000000000000000000000000000001010',
+        blockHash: '0xb2c79c1a7f0260236609649491e2c97009a0e0b52fdd7eeb84a9647dc4b25293',
+        blockNumber: 40149134,
+        logIndex: 227,
+        removed: false,
+        transactionHash: '0xa9f97d3e0ce7a4a567d081b6c57abe108e486b5f508bf8c123827f44e7e4236b',
+        transactionIndex: 53,
+        id: 'log_d02ba5c0',
+        returnValues: {},
+        event: undefined,
+        signature: null,
+        raw: []
+      },
+      Transfer: {
+        address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+        blockHash: '0xb2c79c1a7f0260236609649491e2c97009a0e0b52fdd7eeb84a9647dc4b25293',
+        blockNumber: 40149134,
+        logIndex: 226,
+        removed: false,
+        transactionHash: '0xa9f97d3e0ce7a4a567d081b6c57abe108e486b5f508bf8c123827f44e7e4236b',
+        transactionIndex: 53,
+        id: 'log_179ebf62',
+        returnValues: [],
+        event: 'Transfer',
+        signature: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+        raw: []
+      }
+    },
+    logs: undefined,
+    logsBloom: '0x00000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000408000000800000000000000000200100000000000000000000000000000000000000000000000000000000000180000010000000000001000000000000000000000000000000000000000000000000000000000000202000000000000000000000000000000000080040000000000000000000004000000002000000000001000000000000000000000000000080100000000000000000008000000000000000420000000000000000000000000000000000100000',
+    root: undefined,
+    type: '0x0'
+  }
+
+  export default pos_tx_receipt
