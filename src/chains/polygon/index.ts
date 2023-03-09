@@ -14,6 +14,8 @@ require('dotenv').config()
  * 
  */
 
+export * as alchemy from './alchemy'
+
 import axios from 'axios'
 
 import { ethers } from 'ethers'

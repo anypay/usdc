@@ -8,6 +8,9 @@ require('dotenv').config()
  * - https://www.covalenthq.com/docs/api/#/0/0/USD/1
  * - https://docs.ethers.org/v5/getting-started/
  * - https://medium.com/@mehmetegemenalbayrak/send-erc20-tokens-with-javascript-and-ethers-js-a063df896f99
+ * - https://docs.alchemy.com/docs/deep-dive-into-eth_getlogs
+ * - https://docs.alchemy.com/docs/how-to-track-mined-and-pending-ethereum-transactions
+ * - https://github.com/alchemyplatform/Transaction-Lifecycle-via-SMS
  * 
  * */
 
@@ -18,6 +21,8 @@ import BigNumber from 'bignumber.js'
 import { ethers } from 'ethers'
 
 import ERC20_ABI from "./erc20_abi"
+
+export * as alchemy from './alchemy'
 
 /**
  * Fetches the token balances from a Ethereum blockchain provider. It is designed to support

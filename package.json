@@ -22,6 +22,7 @@
     "@truffle/hdwallet-provider": "^2.1.7",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.14.6",
+    "alchemy-sdk": "^2.6.0",
     "algosdk": "^2.1.0",
     "avalanche": "^3.15.5",
     "base58": "^2.0.1",
