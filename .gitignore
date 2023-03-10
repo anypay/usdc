@@ -2,3 +2,5 @@
 node_modules/
 .nyc_output/
 dist/
+metamask-demo/node_modules/
+metamask-demo/.env

@@ -9,7 +9,8 @@
  * - https://solanacookbook.com/#contributing
  * - https://www.quicknode.com/guides/solana-development/spl-tokens/how-to-transfer-spl-tokens-on-solana/
  * - https://solanacookbook.com/guides/retrying-transactions.html#how-clients-submit-transactions
- *
+ * - https://www.quicknode.com/guides/solana-development/getting-started/how-to-create-websocket-subscriptions-to-solana-blockchain-using-typescript/
+ * - https://blog.tatum.io/how-to-set-up-webhook-notifications-on-solana-71eecf4e2a63
  */
 
 import * as bip39 from 'bip39'
