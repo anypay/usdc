@@ -4,3 +4,4 @@ node_modules/
 dist/
 metamask-demo/node_modules/
 metamask-demo/.env
+**/*.swp

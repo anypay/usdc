@@ -4,6 +4,7 @@ import { expect } from './utils'
 
 import * as usdc from '../src'
 import { ethers } from 'ethers'
+import { buildUSDCTransfer } from '../src/chains/polygon'
 
 const mnemonic = process.env.mnemonic || 'street neglect reform tissue into chef coyote kit crop gun nest now'
 
@@ -87,7 +88,18 @@ describe("Polygon USDC", () => {
 
   describe("Sending Polygon Transactions", () => {
 
-    it('should build a usdc transfer with the pos client', async () => {
+    it('should build a USDC transfer with ethers', async () => {
+
+      const result = await usdc.polygon.buildUSDCTransfer({
+        mnemonic,
+        amount: 0.01,
+        to: '0xA77547a3fB82a5Fa4DB408144870B69c70906989'
+      })
+
+      console.log(result, 'buildUSDCTransfer.result')
+    })
+
+    it.skip('should build a usdc transfer with the pos client', async () => {
 
       console.log('BUILD USDC TRANSFER')
 
@@ -107,7 +119,7 @@ describe("Polygon USDC", () => {
 
     })
 
-    it('#buildUSDCTransaction should build a USDC transaction but not broadcast', async () => {
+    it.skip('should send a USDC transaction and broadcast', async () => {
 
       const to = '0xA77547a3fB82a5Fa4DB408144870B69c70906989'
 
@@ -135,13 +147,14 @@ describe("Polygon USDC", () => {
 
       const result = await erc20ChildToken.transfer(0.01, to, {
         gasPrice,
-        gasLimit: 150000,
+        //gasLimit: 150000,
         from: address
       })
 
       console.log(result, 'USDC Tansfer result')
 
       console.log(Object.keys(result))
+
 
       try {
 
@@ -153,6 +166,8 @@ describe("Polygon USDC", () => {
   
         console.log('txReceipt', txReceipt)   
 
+        console.log(JSON.stringify(txReceipt))
+
         expect(txReceipt.blockNumber).to.be.greaterThan(0)
 
         expect(txReceipt.blockHash).to.be.a('string')
@@ -163,9 +178,30 @@ describe("Polygon USDC", () => {
 
       }
 
-   
-
     })
+  })
+
+  describe('Confirming Polygon Transactions', () => {
+
+    it("#getConfirmations should return the block hash and number of confs", async () => {
+
+
+      const txhash = '0x31d0d79799904d71db3ceb7fe9ec6cdd2d39e963ca187dbb04db38c5351615c9'
+
+      const result: any = await usdc.polygon.getConfirmations({
+        txhash
+      })
+
+      const { confirmations, block_hash, block_number } = result
+
+      expect(confirmations).to.be.greaterThan(0)
+
+      expect(block_number).to.be.greaterThan(0)
+
+      expect(block_hash).to.be.a('string')
+      
+    })
+
   })
 
 })

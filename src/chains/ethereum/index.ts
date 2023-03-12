@@ -11,6 +11,7 @@ require('dotenv').config()
  * - https://docs.alchemy.com/docs/deep-dive-into-eth_getlogs
  * - https://docs.alchemy.com/docs/how-to-track-mined-and-pending-ethereum-transactions
  * - https://github.com/alchemyplatform/Transaction-Lifecycle-via-SMS
+ * - https://eips.ethereum.org/EIPS/eip-191
  * 
  * */
 

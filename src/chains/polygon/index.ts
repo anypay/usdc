@@ -1,6 +1,8 @@
 
 require('dotenv').config()
 
+import alchemy from './alchemy'
+
 /**
  * 
  * Polygon Resources:
@@ -19,6 +21,8 @@ require('dotenv').config()
 export * as alchemy from './alchemy'
 
 import axios from 'axios'
+
+import { getTransaction } from './alchemy'
 
 import { ethers } from 'ethers'
 
@@ -154,31 +158,56 @@ export function isAddress({ address }: {address: string }): boolean {
  */
 export async function buildUSDCTransfer({ mnemonic, to, amount, memo }: { mnemonic: string, to: string, amount: number, memo?: string}): Promise<string> {
 
-  console.log('BUILD USDC TRANSFER')
-
   const {chainId} = ethers.providers.getNetwork('matic')
-
-  console.log("CHAIN ID", chainId)
 
   const provider = new ethers.providers.JsonRpcProvider(process.env.infura_polygon_url, chainId)
 
-  console.log("PROVIDER", provider)
-
   const senderWallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider)
-
-  console.log("SENDER WALLET", senderWallet)
 
   const value = ethers.utils.parseUnits(amount.toString(), 6)
 
   const signer = provider.getSigner(senderWallet.address)
 
-  console.log("SIGNER", signer)
+  let iface = new ethers.utils.Interface(ERC20_ABI)
 
-  const contract = new ethers.Contract('0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e', ERC20_ABI, signer);
+  const data = iface.encodeFunctionData("transfer", [ to, value ])
 
-  console.log('CONTRACT', contract)
+  const address = getAddressFromMnemonic({ mnemonic })
 
-  const result = await contract.transfer(to, value)
+  const fees = await provider.getFeeData()
+
+  console.log('FEE DATA', fees)
+
+  const gasLimit: any = fees.maxFeePerGas
+
+  const gasPrice: any = fees.gasPrice
+
+  const tx = {
+    gasPrice,
+    //gasLimit: 30000,
+    //from: address,
+    to: usdc_token_address,
+    //value: ethers.utils.parseEther('0.1'),
+    data
+  }
+
+  const signedTx = await senderWallet.signTransaction(tx)
+
+  console.log('signedTx', signedTx)
+
+  const serialized = ethers.utils.serializeTransaction(tx)
+
+  console.log('serialized', serialized)
+
+  //const contract = new ethers.Contract('0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e', ERC20_ABI, signer);
+
+  //const result = await contract.transfer(to, value)
+
+  //console.log(result, 'contract.transfer')
+
+  const result: any = await senderWallet.sendTransaction(tx)
+
+  console.log('sendTransaction.result', result)
 
   return result
 }
@@ -188,6 +217,27 @@ export function decodeTransactionHex({ transactionHex }: {transactionHex: string
   const transaction: ethers.Transaction = ethers.utils.parseTransaction(transactionHex)
 
   return transaction
+
+}
+
+export async function getConfirmations({ txhash }: { txhash: string }): Promise<{
+  block_hash: string;
+  block_number: number;
+  confirmations: number;
+}> {
+
+  const [result, blockHeight] = await Promise.all([
+    getTransaction(txhash),
+    alchemy.core.getBlockNumber()
+  ])
+
+  const block_number = Number(result.blockNumber)
+
+  const block_hash = result.blockHash
+
+  const confirmations = blockHeight - block_number
+
+  return { block_number, block_hash, confirmations }
 
 }
 

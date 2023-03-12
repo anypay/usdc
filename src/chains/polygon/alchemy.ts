@@ -20,6 +20,8 @@ const config = {
 
 const alchemy = new Alchemy(config);
 
+export default alchemy 
+
 type HexString = string;
 
 export interface EthGetTransactionResult {
