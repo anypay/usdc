@@ -5,7 +5,7 @@ import { expect } from './utils'
 import * as usdc from '../src'
 import { ethers } from 'ethers'
 
-const mnemonic = 'street neglect reform tissue into chef coyote kit crop gun nest now'
+const mnemonic = process.env.mnemonic || 'street neglect reform tissue into chef coyote kit crop gun nest now'
 
 describe("Polygon USDC", () => {
 
@@ -129,10 +129,13 @@ describe("Polygon USDC", () => {
 
       console.log('FEE DATA', fees)
 
+      const gasLimit: any = fees.maxFeePerGas
+
       const gasPrice: any = fees.gasPrice
 
       const result = await erc20ChildToken.transfer(0.01, to, {
         gasPrice,
+        gasLimit: 150000,
         from: address
       })
 

@@ -12,7 +12,7 @@ require('dotenv').config()
  * - https://wiki.polygon.technology/docs/develop/ethereum-polygon/matic-js/get-started/
  * - https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io/guide/sending-transactions.html#example
  * - https://medium.com/@kaishinaw/connect-metamask-with-ethers-js-fc9c7163fd4d
- * 
+ * - https://forum.polygon.technology/t/impact-of-eip1559-and-future-possibilities/1749
  * 
  */
 
@@ -181,6 +181,14 @@ export async function buildUSDCTransfer({ mnemonic, to, amount, memo }: { mnemon
   const result = await contract.transfer(to, value)
 
   return result
+}
+
+export function decodeTransactionHex({ transactionHex }: {transactionHex: string}): ethers.Transaction {
+
+  const transaction: ethers.Transaction = ethers.utils.parseTransaction(transactionHex)
+
+  return transaction
+
 }
 
 export { getPosClient } from './pos_client'
