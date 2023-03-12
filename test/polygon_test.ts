@@ -92,8 +92,9 @@ describe("Polygon USDC", () => {
 
       const result = await usdc.polygon.buildUSDCTransfer({
         mnemonic,
-        amount: 0.01,
-        to: '0xA77547a3fB82a5Fa4DB408144870B69c70906989'
+        amount: 1,
+        to: '0xA77547a3fB82a5Fa4DB408144870B69c70906989',
+        transmit: true
       })
 
       console.log(result, 'buildUSDCTransfer.result')
@@ -119,7 +120,7 @@ describe("Polygon USDC", () => {
 
     })
 
-    it.skip('should send a USDC transaction and broadcast', async () => {
+    it.skip('should send a USDC transaction broadcast', async () => {
 
       const to = '0xA77547a3fB82a5Fa4DB408144870B69c70906989'
 
@@ -145,9 +146,9 @@ describe("Polygon USDC", () => {
 
       const gasPrice: any = fees.gasPrice
 
-      const result = await erc20ChildToken.transfer(0.01, to, {
+      const result = await erc20ChildToken.transfer(1, to, {
         gasPrice,
-        //gasLimit: 150000,
+        gasLimit: 150000,
         from: address
       })
 
