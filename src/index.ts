@@ -9,6 +9,7 @@ import * as solana from './chains/solana'
 import * as stellar from './chains/stellar'
 import * as tron from './chains/tron'
 import * as request from './request'
+import * as protocol from './protocol'
 
 export {
   algorand,
@@ -20,5 +21,6 @@ export {
   solana,
   stellar,
   tron,
-  request
+  request,
+  protocol
 }

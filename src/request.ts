@@ -1,7 +1,7 @@
 
 import moment from 'moment'
 
-interface PaymentRequest {
+interface IPaymentRequest {
   time: Date;
   expires: Date;
   memo: string;
@@ -19,7 +19,7 @@ interface PaymentRequest {
   }[]
 }
 
-type PaymentRequestTemplate = {
+interface PaymentRequestTemplate {
   chain: string;
   currency: string;
   to: {
@@ -38,7 +38,49 @@ interface EthPaymentOption {
   }[];
 }
 
-export async function create({ template }:{ template: PaymentRequestTemplate}): Promise<PaymentRequest> {
+/*
+class PolyonPaymentRequest extends PaymentRequest {
+
+  submitPayment(txhex: string): Promise<string> {
+
+    // validate transaction
+    // check mempool if transaction already received
+    // broadcast transaction
+    // confirm transaction
+
+    return ''
+
+  }
+
+}
+*/
+
+class PaymentRequest {
+
+  time: Date;
+  expires: Date;
+  memo: string;
+  paymentUrl: string;
+  paymentId: string;
+
+  paymentOptions: {
+    chain: string;
+    currency: string;
+    network: string;
+    estimatedAmount: number;
+    requiredFeeRate: number;
+    minerFee?: number;
+    decimals?: number;
+    selected?: boolean;
+  }[]
+
+  constructor(template: PaymentRequestTemplate) {
+  }
+
+
+}
+
+export async function create({ template }:{ template: PaymentRequestTemplate[]}): Promise<PaymentRequest> {
 
   const time = new Date()
   const expires = moment().add(15, 'minutes').toDate()
@@ -72,7 +114,7 @@ export async function option({
   chain,
   currency
 }: {
-  template: PaymentRequestTemplate,
+  template: PaymentRequestTemplate[],
   chain: string;
   currency: string;
 }): Promise<EthPaymentOption> {

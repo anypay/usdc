@@ -3,6 +3,8 @@ require('dotenv').config()
 
 import alchemy from './alchemy'
 
+import { hexToDec } from 'hex2dec'
+
 /**
  * 
  * Polygon Resources:
@@ -15,6 +17,7 @@ import alchemy from './alchemy'
  * - https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io/guide/sending-transactions.html#example
  * - https://medium.com/@kaishinaw/connect-metamask-with-ethers-js-fc9c7163fd4d
  * - https://forum.polygon.technology/t/impact-of-eip1559-and-future-possibilities/1749
+ * - https://berndstrehl.medium.com/parsing-an-erc20-transfer-with-javascript-from-the-eth-api-2790da37e55f
  * 
  */
 
@@ -160,6 +163,7 @@ export async function buildUSDCTransfer({ mnemonic, to, amount, transmit=false }
   txhex: string,
   transmitResult?: any
   txid?: string;
+  hash?: string;
 }> {
 
   const {chainId} = ethers.providers.getNetwork('matic')
@@ -196,6 +200,7 @@ export async function buildUSDCTransfer({ mnemonic, to, amount, transmit=false }
   
   }
 
+
   return { txhex: signedTx, transmitResult, txid: transmitResult?.hash }
 }
 
@@ -204,6 +209,62 @@ export function decodeTransactionHex({ transactionHex }: {transactionHex: string
   const transaction: ethers.Transaction = ethers.utils.parseTransaction(transactionHex)
 
   return transaction
+
+}
+
+function parseERC20Transfer(transaction: ethers.Transaction): {
+  receiver: string,
+  amount: number,
+  symbol: string,
+  hash: string,
+  sender: string,
+} {
+
+  const input = transaction.data;
+
+  if (
+    input.length !== 138 ||
+    input.slice(2, 10) !== "a9059cbb"
+  ) {
+    throw "NO ERC20 TRANSFER";
+  }
+  const receiver = `0x${transaction.data.slice(34, 74)}`;
+  const amount = hexToDec(transaction.data.slice(74));
+  const symbol = transaction.to;
+  const sender = transaction.from;
+  const hash = transaction.hash
+  return { receiver, amount, symbol, hash, sender };
+}
+
+interface USDCOutput {
+  address: string;
+  amount: number;
+  chain: string;
+  currency: string;
+  txid: string;
+  txhex: string;
+  decimals: number;
+}
+
+export function parseUSDCOutput({ transactionHex }: { transactionHex: string }): USDCOutput | null {
+
+  const transaction = decodeTransactionHex({ transactionHex })
+
+  const { receiver, amount, symbol, sender, hash } = parseERC20Transfer(transaction)
+
+  if (transaction.to !== '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174') {
+    return null;
+  }
+
+  return {
+    chain: 'MATIC',
+    currency: 'USDC',
+    address: receiver,
+    amount: amount,
+    txid: hash,
+    txhex: transactionHex,
+    decimals: 6
+  }
 
 }
 

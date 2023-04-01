@@ -44,13 +44,39 @@ program
 
           to: address,
           
-          amount: parseFloat(amount),
+          amount: parseFloat(amount) * 1_000_000, // 6 decimal places
 
           transmit: true
 
         })
   
         console.log(result)
+
+        const output = polygon.parseUSDCOutput({ transactionHex: result.txhex })
+
+        console.log(output)
+
+        console.log(`${output.amount / 1_000_000} USDC sent to ${output.address} on Polygon`)
+
+        console.log(`Txid: ${result.transmitResult.hash}`)
+
+        let confirmed = false
+
+        console.log('Confirming...')
+
+        while (!confirmed) {
+
+          const { block_hash, confirmations } = await polygon.getConfirmations({ txhash: result.transmitResult.hash })
+
+          if (confirmations > 0) {
+
+            confirmed = true
+
+            console.log(`Transaction Confirmed in Block ${block_hash}`)
+
+          }
+
+        }
 
       } catch(error) {
 
