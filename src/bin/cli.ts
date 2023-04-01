@@ -9,6 +9,8 @@ const program = new Command()
 
 import { polygon } from '../../src'
 
+import axios from 'axios'
+
 /*
  * > usdc-cli send MATIC $address 100
  *
@@ -111,7 +113,58 @@ program
  */
 program
   .command('pay <chain> <url>')
-  .action(async (chain) => {
+  .action(async (chain, url) => {
+
+    var mnemonic = process.env.mnemonic
+
+    if (!mnemonic) {
+
+      mnemonic = read({
+        prompt: 'enter mnemonic seed phrase (hidden):',
+        silent: true
+      })
+
+    }
+
+    const { data } = await axios.post(url, {
+      chain,
+      currency: 'USDC'
+    }, {
+      headers: {
+        'content-type': 'application/payment-request'
+      }
+    })
+
+    console.log(data)
+
+    const { address, amount } = data.instructions[0].outputs[0]
+
+    const result = await polygon.buildUSDCTransfer({
+
+      mnemonic,
+
+      to: address,
+      
+      amount
+
+    })
+
+    console.log(result, 'buildUSDCTransfer.result')
+
+    const { data: sendResult } = await axios.post(url, {
+      chain,
+      currency: 'USDC',
+      transactions: [{
+        tx: result.txhex
+      }]
+    }, {
+      headers: {
+        'content-type': 'application/payment'
+      }
+    })
+
+    console.log(sendResult, 'anypay.payment.send.result')
+
 
 
   })
