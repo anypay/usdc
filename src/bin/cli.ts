@@ -1,4 +1,5 @@
 #!/usr/bin/env ts-node
+require('dotenv').config()
 
 import { Command } from 'commander'
 
@@ -46,11 +47,13 @@ program
           
           amount: parseFloat(amount) * 1_000_000, // 6 decimal places
 
-          transmit: true
-
         })
   
         console.log(result)
+
+        const receipt = await polygon.broadcastSignedTransaction({ txhex: result.txhex })
+
+        console.log('broadcast.receipt', receipt)
 
         const output = polygon.parseUSDCOutput({ transactionHex: result.txhex })
 
@@ -58,7 +61,7 @@ program
 
         console.log(`${output.amount / 1_000_000} USDC sent to ${output.address} on Polygon`)
 
-        console.log(`Txid: ${result.transmitResult.hash}`)
+        console.log(`Txid: ${result.txid}`)
 
         let confirmed = false
 
@@ -66,7 +69,7 @@ program
 
         while (!confirmed) {
 
-          const { block_hash, confirmations } = await polygon.getConfirmations({ txhash: result.transmitResult.hash })
+          const { block_hash, confirmations } = await polygon.getConfirmations({ txhash: result.txid })
 
           if (confirmations > 0) {
 

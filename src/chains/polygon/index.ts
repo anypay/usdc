@@ -5,6 +5,8 @@ import alchemy from './alchemy'
 
 import { hexToDec } from 'hex2dec'
 
+import Web3 from 'web3'
+
 /**
  * 
  * Polygon Resources:
@@ -36,7 +38,6 @@ import ERC20_ABI from '../ethereum/erc20_abi';
 const usdc_token_address = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'
 
 const matic_token_address = '0x0000000000000000000000000000000000001010'
-
 
 export interface CovalentTokenBalanceResponseItem {
   contract_decimals: number;
@@ -161,9 +162,7 @@ export function isAddress({ address }: {address: string }): boolean {
  */
 export async function buildUSDCTransfer({ mnemonic, to, amount, transmit=false }: { mnemonic: string, to: string, amount: number, transmit?: boolean }): Promise<{
   txhex: string,
-  transmitResult?: any
-  txid?: string;
-  hash?: string;
+  txid: string;
 }> {
 
   const {chainId} = ethers.providers.getNetwork('matic')
@@ -172,36 +171,62 @@ export async function buildUSDCTransfer({ mnemonic, to, amount, transmit=false }
 
   const senderWallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider)
 
+  console.log(senderWallet.address, 'sender')
+
   let contract = new ethers.utils.Interface(ERC20_ABI)
 
   const data = contract.encodeFunctionData("transfer", [ to, amount ])
 
   const fees = await provider.getFeeData()
 
-  const gasLimit: any = fees.maxFeePerGas
-
   const gasPrice: any = fees.gasPrice
 
-  const tx = {
+  const transactionRequest = {
     gasPrice,
     to: usdc_token_address,
     data
   }
 
-  const signedTx = await senderWallet.signTransaction(tx)
+  const populatedTransactionRequest = await senderWallet.populateTransaction(transactionRequest)
 
-  var transmitResult: any;
+  const signedTxHex = await senderWallet.signTransaction(populatedTransactionRequest)
 
-  if (transmit) {
-      
-      transmitResult = await senderWallet.sendTransaction(tx)
+  const transaction = decodeTransactionHex({ transactionHex: signedTxHex })
 
-      console.log('polygon.provider.sendTransaction.result', transmitResult)
+  const transfer = parseERC20Transfer(transaction)
   
-  }
+  return { txhex: signedTxHex, txid: transfer.hash }
+}
 
+interface TransmitResult {
+  blockHash: string,
+  blockNumber: number,
+  contractAddress: string,
+  cumulativeGasUsed: number,
+  effectiveGasPrice: number,
+  from: string,
+  gasUsed: number,
+  logs: any[]
+  logsBloom: string;
+  status: boolean;
+  to: string;
+  transactionHash: string;
+  transactionIndex: number;
+  type: string;
+}
 
-  return { txhex: signedTx, transmitResult, txid: transmitResult?.hash }
+export async function broadcastSignedTransaction({ txhex }: {txhex: string}): Promise<TransmitResult> {
+
+  console.log("broadcastSignedTransaction", txhex)
+
+  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_polygon_url))
+
+  const transmitResult: any = await web3.eth.sendSignedTransaction(txhex)
+
+  console.log('polygon.provider.sendTransaction.result', transmitResult)
+
+  return transmitResult
+
 }
 
 export function decodeTransactionHex({ transactionHex }: {transactionHex: string}): ethers.Transaction {
@@ -212,7 +237,7 @@ export function decodeTransactionHex({ transactionHex }: {transactionHex: string
 
 }
 
-function parseERC20Transfer(transaction: ethers.Transaction): {
+export function parseERC20Transfer(transaction: ethers.Transaction): {
   receiver: string,
   amount: number,
   symbol: string,
