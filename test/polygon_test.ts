@@ -205,4 +205,26 @@ describe("Polygon USDC", () => {
 
   })
 
+  describe('Decoding Polygon USDC Transfer From TxId Only', () => {
+
+    it('should fetch the transaction details from Infura and parse the input data', async () => {
+
+      const txid = '0x44e17e71faa3d14ba31085dc89244e5f9bb72bac50a15bfa5f7ab6a8864e0620'
+
+      const result: any = await usdc.polygon.fetchERC20Transfer({ txid })
+
+      console.log('RESULT1', result)
+
+      expect(result.parsed.amount).to.be.equal(10000)
+
+      expect(result.parsed.address).to.be.equal('0x78291d2ad33bb8577c53929961c38bc1adc66ee8')
+
+      expect(result.parsed.token).to.be.equal('0x2791bca1f2de4661ed88a30c99a7a9449aa84174')
+
+      console.log(result)
+
+    })
+
+  })
+
 })

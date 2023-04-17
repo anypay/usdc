@@ -320,4 +320,63 @@ export async function getConfirmations({ txhash }: { txhash: string }): Promise<
 
 }
 
+interface GetTransactionByHashResult {
+  accessList?: any[];
+  blockHash: string;
+  blockNumber: number;
+  chainId?: string;
+  from: string;
+  gas: number;
+  gasPrice: string;
+  hash: string;
+  input: string;
+  maxFeePerGas: string;
+  maxPriorityFeePerGas: string;
+  nonce: number;
+  r: string;
+  s: string;
+  to: string;
+  transactionIndex: number;
+  type?: number;
+  v: string;
+  value: string;
+}
+
+export async function fetchERC20Transfer({ txid }: { txid: string }): Promise<{
+  parsed: {
+    address: string,
+    amount: number,
+    token: string
+  },
+  full: GetTransactionByHashResult
+}> {
+
+  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_polygon_url))
+
+  const result: any = await web3.eth.getTransaction(txid)
+
+  const input = result.input
+
+  if (
+    input.length !== 138 ||
+    input.slice(2, 10) !== "a9059cbb"
+  ) {
+    throw "NO ERC20 TRANSFER";
+  }
+  const address = `0x${input.slice(34, 74)}`;
+  const amount = parseInt(hexToDec(input.slice(74)));
+  const token = result.to.toLowerCase();
+
+  return {
+    parsed: {
+      address,
+      amount,
+      token
+    },
+    full: result
+  }
+
+}
+
 export { getPosClient } from './pos_client'
+
