@@ -17,7 +17,7 @@ USDC is available on many of the world's leading blockchains, with more chain in
 ### Installation
 
 ```
-npm install --save @anypay/usdc
+npm install --save usdc
 
 ```
 
@@ -26,7 +26,7 @@ npm install --save @anypay/usdc
 ##### Stellar
 
 ```
-import { stellar } from '@anypay/usdc'
+import { stellar } from 'usdc'
 
 stellar.getUSDCBalance({ address: process.env.stellar_usdc_address })
 	.then(console.log)
@@ -47,7 +47,7 @@ stellar.checkPaymentStatus({ txid }).then(console.log)
 ##### Ethereum
 
 ```
-import { ethereum } from '@anypay/usdc'
+import { ethereum } from 'usdc'
 
 ethereum({ address: process.env.ethereum_usdc_address })
 	.then(console.log)
@@ -67,7 +67,7 @@ ethereum.checkPaymentStatus({ txid }).then(console.log)
 ##### Polygon
 
 ```
-import { polygon } from '@anypay/usdc'
+import { polygon } from 'usdc'
 
 polygon({ address: process.env.polygon_usdc_address })
 	.then(console.log)
@@ -87,7 +87,7 @@ polygon.checkPaymentStatus({ txid }).then(console.log)
 ##### Hedera
 
 ```
-import { hedera } from '@anypay/usdc'
+import { hedera } from 'usdc'
 
 hedera({ address: process.env.hedera_usdc_address })
 	.then(console.log)
@@ -107,7 +107,7 @@ hedera.checkPaymentStatus({ txid }).then(console.log)
 ##### Avalanche
 
 ```
-import { avalanche } from '@anypay/usdc'
+import { avalanche } from 'usdc'
 
 avalanche({ address: process.env.avalanche_usdc_address })
 	.then(console.log)
@@ -127,7 +127,7 @@ avalanche.checkPaymentStatus({ txid }).then(console.log)
 ##### Solana
 
 ```
-import { solana } from '@anypay/usdc'
+import { solana } from 'usdc'
 
 solana({ address: process.env.solana_usdc_address })
 	.then(console.log)
@@ -147,7 +147,7 @@ solana.checkPaymentStatus({ txid }).then(console.log)
 ##### Tron
 
 ```
-import { tron } from '@anypay/usdc'
+import { tron } from 'usdc'
 
 tron({ address: process.env.tron_usdc_address })
 	.then(console.log)
@@ -167,7 +167,7 @@ tron.checkPaymentStatus({ txid }).then(console.log)
 ##### Flow
 
 ```
-import { flow } from '@anypay/usdc'
+import { flow } from 'usdc'
 
 flow({ address: process.env.flow_usdc_address })
 	.then(console.log)
@@ -187,7 +187,7 @@ flow.checkPaymentStatus({ txid }).then(console.log)
 ##### Algorand
 
 ```
-import { algorand } from '@anypay/usdc'
+import { algorand } from 'usdc'
 
 algorand({ address: process.env.algorand_usdc_address })
 	.then(console.log)
